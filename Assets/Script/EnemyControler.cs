@@ -5,6 +5,8 @@ using UnityEngine;
 public class EnemyControler : MonoBehaviour
 {
     private Rigidbody2D rb;
+    private Vector3 StartPosition;
+
     public Transform Player;
     public float AggroRadius;
     public float Acceleration;
@@ -13,6 +15,7 @@ public class EnemyControler : MonoBehaviour
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        StartPosition = transform.position;
     }
     
     private void FixedUpdate()
@@ -23,12 +26,10 @@ public class EnemyControler : MonoBehaviour
         }
     }
 
-    // called when the cube hits the floor
-    void OnCollisionEnter2D(Collision2D col)
+    public void Reset()
     {
-        if (Player != null && Player.CompareTag(col.collider.tag))
-        {
-            Destroy(Player.gameObject);
-        }
+        transform.position = StartPosition;
+        rb.velocity = Vector2.zero;
     }
+
 }
