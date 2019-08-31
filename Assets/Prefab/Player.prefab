@@ -49,9 +49,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   JumpClip: {fileID: 8300000, guid: e287f8929e4129847a783a25735f6c8b, type: 3}
   DeathClip: {fileID: 8300000, guid: 52af7d3aa5739294d8e8c606da21eaab, type: 3}
-  Acceleration: 50
-  MaxSpeed: 5
-  JumpForce: 300
+  PlayerData: {fileID: 11400000, guid: 605656c3e0d5cb340b6ffdef217900c3, type: 2}
 --- !u!50 &4741699726631286045
 Rigidbody2D:
   serializedVersion: 4

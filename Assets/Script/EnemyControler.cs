@@ -22,9 +22,23 @@ public class EnemyControler : MonoBehaviour
     {
         if (Player != null && Vector3.Distance(Player.position,transform.position) <= AggroRadius && rb.velocity.magnitude < MaxSpeed)
         {
-            rb.AddForce(new Vector2(Player.position.x - transform.position.x,0).normalized * Acceleration);
+            rb.AddForce(new Vector2(Player.position.x - transform.position.x, Player.position.y - transform.position.y).normalized * Acceleration);
+            if(Player.position.x > transform.position.x)
+            {
+                FlipGraphics(0);
+            }
+            else
+            {
+                FlipGraphics(180);
+            }
         }
     }
+
+    private void FlipGraphics(int Side)
+    {
+        transform.eulerAngles = new Vector3(0, Side, 0); // Flipped
+    }
+
 
     public void Reset()
     {

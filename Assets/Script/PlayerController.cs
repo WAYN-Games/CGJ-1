@@ -10,14 +10,12 @@ public class PlayerController : MonoBehaviour
     private bool IsGrounded = false;
     private Vector3 StartPosition;
     private Animator Animator;
+    private int CurrentJumpCount = 0;
 
     public AudioClip JumpClip;
     public AudioClip DeathClip;
 
-    public float Acceleration;
-    public float MaxSpeed;
-    public float JumpForce;
-
+    public PlayerData PlayerData;
     private void Awake()
     {
         Player = GetComponent<Rigidbody2D>();
@@ -33,19 +31,20 @@ public class PlayerController : MonoBehaviour
 
         if (!IsDead)
         {
-            if (Input.GetKey(KeyCode.D) && Player.velocity.x < MaxSpeed)
+            if (Input.GetKey(KeyCode.D) && Player.velocity.x < PlayerData.MaxSpeed)
             {
-                Player.AddForce(Vector2.right * Acceleration);
+                Player.AddForce(Vector2.right * PlayerData.Acceleration);
                 FlipGraphics(0);
             }
-            if (Input.GetKey(KeyCode.Q) && Player.velocity.x > -MaxSpeed)
+            if (Input.GetKey(KeyCode.Q) && Player.velocity.x > -PlayerData.MaxSpeed)
             {
-                Player.AddForce(Vector2.left * Acceleration);
+                Player.AddForce(Vector2.left * PlayerData.Acceleration);
                 FlipGraphics(180);
             }
-            if (Input.GetKeyDown(KeyCode.Z) && Player.velocity.y < MaxSpeed && IsGrounded)
+            if (Input.GetKeyDown(KeyCode.Z) && Player.velocity.y < PlayerData.MaxSpeed && (IsGrounded || CurrentJumpCount < PlayerData.JumpCount))
             {
-                Player.AddForce(Vector2.up * JumpForce);
+                Player.AddForce(Vector2.up * PlayerData.JumpForce);
+                CurrentJumpCount++;
                 AudioSource.clip = JumpClip;
                 AudioSource.Play();
             }
@@ -76,8 +75,11 @@ public class PlayerController : MonoBehaviour
             AudioSource.Play();
             IsDead = true;
         }
-
-        IsGrounded = colLayer == 10;
+        if (colLayer == 10)
+        {
+            IsGrounded = true;
+            CurrentJumpCount = 0;
+        }
 
     }
     private void OnCollisionExit2D(Collision2D collision)
