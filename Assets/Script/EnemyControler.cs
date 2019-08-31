@@ -6,6 +6,7 @@ public class EnemyControler : MonoBehaviour
 {
     private Rigidbody2D rb;
     private Vector3 StartPosition;
+    private bool Aggroed = false;
 
     public Transform Player;
     public float AggroRadius;
@@ -20,9 +21,13 @@ public class EnemyControler : MonoBehaviour
     
     private void FixedUpdate()
     {
-        if (Player != null && Vector3.Distance(Player.position,transform.position) <= AggroRadius && rb.velocity.magnitude < MaxSpeed)
+        if (Player != null && (Vector3.Distance(Player.position,transform.position) <= AggroRadius || Aggroed) )
         {
             rb.AddForce(new Vector2(Player.position.x - transform.position.x, Player.position.y - transform.position.y).normalized * Acceleration);
+            if(rb.velocity.magnitude > MaxSpeed)
+            {
+                rb.velocity = rb.velocity.normalized * MaxSpeed;
+            }
             if(Player.position.x > transform.position.x)
             {
                 FlipGraphics(0);
@@ -31,6 +36,7 @@ public class EnemyControler : MonoBehaviour
             {
                 FlipGraphics(180);
             }
+            Aggroed = true;
         }
     }
 
@@ -43,7 +49,10 @@ public class EnemyControler : MonoBehaviour
     public void Reset()
     {
         transform.position = StartPosition;
+        rb = GetComponent<Rigidbody2D>();
         rb.velocity = Vector2.zero;
+        Aggroed = false;
+        gameObject.SetActive(true);
     }
 
 }

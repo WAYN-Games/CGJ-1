@@ -7,11 +7,14 @@ public class EndLevel : MonoBehaviour
     public GameObject UIPanel;
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        UIPanel.SetActive(true);
+        if(collision.transform.gameObject.layer==8)
+            UIPanel.SetActive(true);
     }
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        UIPanel.SetActive(false);
+
+        if (collision.transform.gameObject.layer == 8)
+            UIPanel.SetActive(false);
     }
 }

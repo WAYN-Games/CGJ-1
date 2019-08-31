@@ -9,5 +9,6 @@ public class PlayerData : ScriptableObject
     public float MaxSpeed;
     public float JumpForce;
     public int JumpCount;
+    public float Cooldown;
 
 }

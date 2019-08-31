@@ -14,5 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Acceleration: 50
   MaxSpeed: 5
-  JumpForce: 300
-  JumpCount: 1
+  JumpForce: 360
+  JumpCount: 0
+  Cooldown: 1

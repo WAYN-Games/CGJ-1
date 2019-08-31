@@ -1,6 +1,7 @@
 ﻿
 using System;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
@@ -11,9 +12,17 @@ public class PlayerController : MonoBehaviour
     private Vector3 StartPosition;
     private Animator Animator;
     private int CurrentJumpCount = 0;
+    private float CurrentCooldown;
+    public Collider2D DamageArea;
 
     public AudioClip JumpClip;
     public AudioClip DeathClip;
+    public AudioClip AtackClip;
+
+    public Text EndGameTextField;
+    [TextArea(2,2)]
+    public string EndGameText;
+    private bool isGameOver = false;
 
     public PlayerData PlayerData;
     private void Awake()
@@ -26,9 +35,17 @@ public class PlayerController : MonoBehaviour
        
     private void FixedUpdate()
     {
-       
+        if (isGameOver)
+        {
+            if (!AudioSource.isPlaying)
+            {
+                gameObject.SetActive(false);
+            }
+            return;
+        }
+        
 
-
+        Animator.SetBool("Attack", false);
         if (!IsDead)
         {
             if (Input.GetKey(KeyCode.D) && Player.velocity.x < PlayerData.MaxSpeed)
@@ -41,12 +58,26 @@ public class PlayerController : MonoBehaviour
                 Player.AddForce(Vector2.left * PlayerData.Acceleration);
                 FlipGraphics(180);
             }
-            if (Input.GetKeyDown(KeyCode.Z) && Player.velocity.y < PlayerData.MaxSpeed && (IsGrounded || CurrentJumpCount < PlayerData.JumpCount))
+            if(PlayerData.JumpCount > 0) { 
+                if (Input.GetKeyDown(KeyCode.Z) && Player.velocity.y < PlayerData.MaxSpeed && (IsGrounded || CurrentJumpCount < PlayerData.JumpCount))
+                {
+                    Player.AddForce(Vector2.up * PlayerData.JumpForce);
+                    CurrentJumpCount++;
+                    AudioSource.clip = JumpClip;
+                    AudioSource.Play();
+                }
+            }
+            if (Input.GetMouseButton(1) && CurrentCooldown < 0 && PlayerData.Cooldown < 1)
             {
-                Player.AddForce(Vector2.up * PlayerData.JumpForce);
-                CurrentJumpCount++;
-                AudioSource.clip = JumpClip;
+                CurrentCooldown = PlayerData.Cooldown;
+                DamageArea.gameObject.SetActive(true);
+                AudioSource.clip = AtackClip;
+                Animator.SetBool("Attack", true);
                 AudioSource.Play();
+            }
+            else
+            {
+                DamageArea.gameObject.SetActive(false);
             }
         }
         if (IsGrounded)
@@ -57,7 +88,10 @@ public class PlayerController : MonoBehaviour
         {
             Animator.SetFloat("Speed", 0);
         }
-        
+
+        CurrentCooldown -= Time.fixedDeltaTime;
+
+
 
     }
    
@@ -80,6 +114,13 @@ public class PlayerController : MonoBehaviour
             IsGrounded = true;
             CurrentJumpCount = 0;
         }
+        if (colLayer == 12 && !isGameOver)
+        { 
+            AudioSource.clip = DeathClip;
+            AudioSource.Play();
+            isGameOver = true;           
+            EndGameTextField.text = EndGameText;
+        } 
 
     }
     private void OnCollisionExit2D(Collision2D collision)
@@ -98,7 +139,8 @@ public class PlayerController : MonoBehaviour
         {
             transform.position = StartPosition;
             IsDead = false;
-            EnemyControler[] enemies = FindObjectsOfType<EnemyControler>();
+            EnemyControler[] enemies = (EnemyControler[] )Resources.FindObjectsOfTypeAll(typeof(EnemyControler));
+
             foreach (var enemy in enemies)
             {
                 enemy.Reset();
